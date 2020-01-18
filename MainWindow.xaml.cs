@@ -108,14 +108,12 @@ namespace Tinkoff
         }
 
   
-        private async Task GetTopTwoDaysFall(Context context, Currency curr, DateTime startDate, DateTime endDate)
+        private async Task GetPriceChange(Context context, Currency curr, DateTime startDate, DateTime endDate)
         {
             if (startDate > endDate) 
             { ErrorTextBlock.Text = "Первая дата больше второй"; return; }
 
             CandleInterval interval;
-            //if ((endDate - startDate).TotalDays <= 1)  interval = CandleInterval.HalfHour;
-            //else 
             if ((endDate - startDate).TotalDays <=7) interval = CandleInterval.Hour;
                 else  if ((endDate - startDate).TotalDays <= 30) interval = CandleInterval.Day;
                         else  interval = CandleInterval.Week;
@@ -136,6 +134,9 @@ namespace Tinkoff
                        // List<CandlePayload> candles= ( await context.MarketCandlesAsync(instrument.Figi, DateTime.Now.AddDays(-2), DateTime.Now, CandleInterval.Hour)).Candles;
                         if (candles.Count > 0 && candles.Last().Close < priceLimit)
                             dif[instrument.Name] = Math.Round((candles[0].Open - candles.Last().Close) / candles.Last().Close * 100,2)*-1;
+                        candles= (await context.MarketCandlesAsync(instrument.Figi, DateTime.Today, DateTime.Today.AddDays(0.99),
+                            CandleInterval.Minute)).Candles;
+                        File.WriteAllText("data.txt", $"{instrument.Name} - H={Hurst.CalculateHurst(candles)}");
                     }
                     catch (Exception e)
                     {
@@ -196,7 +197,7 @@ namespace Tinkoff
         {
             ErrorTextBlock.Text = "";
             if (context != null)
-                await GetTopTwoDaysFall(context, savedata.Currency,savedata.StartDate, savedata.EndDate);
+                await GetPriceChange(context, savedata.Currency,savedata.StartDate, savedata.EndDate);
         }
 
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
