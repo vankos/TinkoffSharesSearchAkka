@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Tinkoff"
         mc:Ignorable="d"
-        Title="MainWindow" Height="506.962" Width="281.335">
-    <Grid>
+        Title="MainWindow" Height="506.962" Width="319.335">
+    <Grid Margin="0,0,7,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100*"/>
             <ColumnDefinition Width="28*"/>
@@ -14,17 +14,15 @@
         </Grid.ColumnDefinitions>
         <TextBlock Margin="11,5,90,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="3"><Run Text="Максимальная цена акции"/><Run Text=":"/></TextBlock>
         <TextBox x:Name="MoneyLimit" Margin="15,25,0,425" TextWrapping="Wrap" RenderTransformOrigin="0.476,-0.184" HorizontalAlignment="Left" Width="124" Grid.ColumnSpan="3" TextChanged="TextBox_TextChanged"/>
-        <TextBox x:Name="TokenTextEdit" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="30" Margin="7,396,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="254" TextChanged="TextBox_TextChanged_1"/>
+        <TextBox x:Name="TokenTextEdit" Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="30" Margin="7,396,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="296" TextChanged="TextBox_TextChanged_1"/>
         <TextBlock x:Name="TokenTextBox" Margin="9,374,92,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.ColumnSpan="3" Text="Вставь свой токен ниже:"/>
-        <Button Content="Показать" Grid.Column="2" HorizontalAlignment="Right" Margin="0,25,37,0" VerticalAlignment="Top" Width="86" Click="Button_Click" Height="22" RenderTransformOrigin="0.623,0.474"/>
+        <Button Content="Показать" Grid.Column="2" Margin="5,27,0,0" VerticalAlignment="Top" Click="Button_Click" Height="22" RenderTransformOrigin="0.623,0.474" HorizontalAlignment="Left" Width="79"/>
         <TextBlock x:Name="ErrorTextBlock" HorizontalAlignment="Left" Margin="7,430,0,0" TextWrapping="Wrap" VerticalAlignment="Top" AutomationProperties.Name="ErrorTextBlock" Grid.ColumnSpan="3" Width="255" Height="42"/>
-        <RadioButton x:Name="USDRadioButton" Content="USD" HorizontalAlignment="Left" Margin="16,91,0,0" VerticalAlignment="Top" Width="44" IsChecked="True" GroupName="Currency" Checked="USDRadioButton_Checked"/>
-        <RadioButton x:Name="RubRadioButton" Content="RUB" HorizontalAlignment="Left" Margin="71,92,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="2.063,0.796" Grid.ColumnSpan="2" Checked="RubRadioButton_Checked" GroupName="Currency"/>
-        <DatePicker x:Name="StartDate" Margin="0,58,6,0" VerticalAlignment="Top" Grid.ColumnSpan="2" FirstDayOfWeek="Monday" HorizontalAlignment="Right" Width="102" SelectedDateChanged="DatePicker_SelectedDateChanged">
-        </DatePicker>
-        <DatePicker x:Name="EndDate" HorizontalAlignment="Left" Margin="8,59,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.46,0.746" Grid.Column="2" SelectedDateChanged="EndDate_SelectedDateChanged">
-        </DatePicker>
-        <DataGrid x:Name="DataDataGrid" RenderTransformOrigin="2.4,-0.3" Grid.ColumnSpan="3" Margin="9,125,13,100"/>
+        <RadioButton x:Name="USDRadioButton" Content="USD" HorizontalAlignment="Left" Margin="15,90,0,0" VerticalAlignment="Top" Width="44" IsChecked="True" GroupName="Currency" Checked="RubRadioButton_Checked"/>
+        <RadioButton x:Name="RubRadioButton" Content="RUB" HorizontalAlignment="Left" Margin="66,90,0,0" VerticalAlignment="Top" Width="44" RenderTransformOrigin="2.063,0.796" Checked="RubRadioButton_Checked" GroupName="Currency"/>
+        <DatePicker x:Name="StartDate" Margin="15,58,0,0" VerticalAlignment="Top" FirstDayOfWeek="Monday" SelectedDateChanged="DatePicker_SelectedDateChanged" HorizontalAlignment="Left" Width="92"/>
+        <DatePicker x:Name="EndDate" Margin="0,57,86,0" VerticalAlignment="Top" RenderTransformOrigin="1.46,0.746" SelectedDateChanged="EndDate_SelectedDateChanged" Grid.ColumnSpan="2" HorizontalAlignment="Right" Width="98" Grid.Column="1"/>
+        <DataGrid x:Name="DataDataGrid" RenderTransformOrigin="2.4,-0.3" Grid.ColumnSpan="3" Margin="9,125,0,100" HorizontalAlignment="Left" Width="291"/>
 
     </Grid>
 </Window>
