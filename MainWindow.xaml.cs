@@ -12,7 +12,8 @@ using Tinkoff.Trading.OpenApi.Models;
 using System.Data;
 using System.Net;
 using System.Text.RegularExpressions;
-using Python.Runtime;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
 
 namespace Tinkoff
 {
@@ -22,7 +23,7 @@ namespace Tinkoff
     public partial class MainWindow : Window
     {
         private const string saveFilePath = "savedData.dat";
-        private Context context = null;
+        private Context context;
         private readonly SaveData savedata;
         private readonly bool IsInitializing;
 
@@ -47,6 +48,8 @@ namespace Tinkoff
                 ErrorTextBlock.Text = "Неправильный токен";
             }
             IsInitializing = false;
+            StartDate.SelectedDate = DateTime.Now.AddMonths(-1);
+            EndDate.SelectedDate = DateTime.Now;
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -54,7 +57,8 @@ namespace Tinkoff
             if (IsInitializing) return;
             try
             {
-                savedata.MoneyLimitValue = decimal.Parse(MoneyLimit.Text);
+                var price = MoneyLimit.Text.Replace('.', ',');
+                savedata.MoneyLimitValue = decimal.Parse(price);
                 savedata.Save();
                 ErrorTextBlock.Text = "";
             }
@@ -119,7 +123,7 @@ namespace Tinkoff
                 {
                     try
                     {
-                        Thread.Sleep(100);
+                        Thread.Sleep(250);
                         List<CandlePayload> candles = (await context.MarketCandlesAsync(instrument.Figi, DateTime.SpecifyKind(startDate, DateTimeKind.Local), DateTime.SpecifyKind(endDate, DateTimeKind.Local), interval)).Candles;
                         if (candles.Count > 0 && candles.Last().Close < priceLimit)
                         {
@@ -127,17 +131,24 @@ namespace Tinkoff
                             string name = instrument.Name;
                             decimal growth = Math.Round((candles[0].Open - candles.Last().Close) / candles.Last().Close * 100, 2) * -1;
                             decimal linearity = GetMadeUpCoeff(candles);
-                            string zacksScore = linearity<(decimal)0.1 && curr!=Currency.Rub && growth>0? await GetZacksScore(instrument.Ticker):"";
-                            diff.Rows.Add(name, growth, $"{linearity:#0.##%}",zacksScore);
+                            string zacksScore= "";//linearity<(decimal)0.5 && curr!=Currency.Rub && growth>0? await GetZacksScore(instrument.Ticker):"";
+                            if((!filterNonLinear.IsChecked??false)|| linearity < (decimal)0.5)
+                                diff.Rows.Add(name, growth, linearity.ToString("n2"),zacksScore);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         failedInstrumentCount++;
                     }
                 }
                 DataDataGrid.ItemsSource = diff.DefaultView;
-                ErrorTextBlock.Text = $"Всего {diff.Rows.Count+ failedInstrumentCount} акций \nПоказано {diff.Rows.Count} акций\nЗафейлилось {failedInstrumentCount} акций";
+                string resultText = $"Всего {diff.Rows.Count + failedInstrumentCount} акций \nПоказано {diff.Rows.Count} акций\nЗафейлилось {failedInstrumentCount} акций";
+                ErrorTextBlock.Text = resultText;
+                var xml = $"<?xml version=\"1.0\"?><toast><visual><binding template=\"ToastText01\"><text id=\"1\">{resultText}</text></binding></visual></toast>";
+                var toastXml = new  XmlDocument();
+                toastXml.LoadXml(xml);
+                var toast = new ToastNotification(toastXml);
+                ToastNotificationManager.CreateToastNotifier("Готово").Show(toast);
             }
             catch (Exception e)
             {
@@ -154,7 +165,7 @@ namespace Tinkoff
             {
                 diffs.Add(Math.Abs(candles[x - 1].Close-(k * x+b))/ (k * x + b));
             }
-            return diffs.Average();
+            return diffs.Sum();
         }
 
         private async Task<string> GetZacksScore(string secCode)
