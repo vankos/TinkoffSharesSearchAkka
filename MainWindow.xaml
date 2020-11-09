@@ -5,26 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Tinkoff"
         mc:Ignorable="d"
-        Title="MainWindow" Height="750" Width="523.335">
-    <DockPanel LastChildFill="True" Margin="8,8,8,8">
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+        Title="MainWindow" Height="750" Width="523.335" Padding="5">
+    <DockPanel LastChildFill="True" Margin="8,0,8,8">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,9,8,8">
             <Label Content="Максимальная цена акции"/>
-            <TextBox x:Name="MoneyLimit" TextChanged="TextBox_TextChanged" Width="150"/>
+            <TextBox x:Name="MoneyLimit" TextChanged="TextBox_TextChanged" Width="150" Margin="8,0,8,8"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
             <RadioButton x:Name="USDRadioButton" Content="USD"  Width="44" IsChecked="True" GroupName="Currency" Checked="RubRadioButton_Checked"/>
             <RadioButton x:Name="RubRadioButton" Content="RUB" Width="44" Checked="RubRadioButton_Checked" GroupName="Currency"/>
         </StackPanel>
-        <StackPanel  Orientation="Horizontal" DockPanel.Dock="Top">
+        <StackPanel  Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
             <DatePicker x:Name="StartDate"  SelectedDateChanged="DatePicker_SelectedDateChanged" Width="95"/>
             <DatePicker x:Name="EndDate" SelectedDateChanged="EndDate_SelectedDateChanged" Width="95"/>
         </StackPanel>
-        <CheckBox x:Name="filterNonLinear" Content="не показывать с низкой линейностью" IsChecked="True" DockPanel.Dock="Top"/>
-        <DataGrid x:Name="DataDataGrid"  DockPanel.Dock="Top" Height="400"/>
-        <Label x:Name="TokenTextBox" Content="Вставь свой токен ниже:" DockPanel.Dock="Top"/>
-        <TextBox x:Name="TokenTextEdit" Height="30" TextWrapping="Wrap" Width="482" TextChanged="TextBox_TextChanged_1" DockPanel.Dock="Top"/>
-        <Button Content="Показать" Click="Button_Click" Height="25" Width="79" DockPanel.Dock="Top" HorizontalAlignment="Left"/>
-        <TextBlock x:Name="ErrorTextBlock" Width="484" TextWrapping="Wrap" DockPanel.Dock="Top"/>
+        <CheckBox x:Name="filterNonLinear" Content="не показывать с низкой линейностью" IsChecked="True" DockPanel.Dock="Top" Margin="8,8,8,8"/>
+        <DataGrid x:Name="DataDataGrid"  DockPanel.Dock="Top" Height="400" Margin="8,0,8,8"/>
+        <Label x:Name="TokenTextBox" Content="Вставь свой токен ниже:" DockPanel.Dock="Top" Margin="8,0,8,0"/>
+        <TextBox x:Name="TokenTextEdit" Height="30" TextWrapping="Wrap" Width="482" TextChanged="TextBox_TextChanged_1" DockPanel.Dock="Top" Margin="8,0,8,8"/>
+        <Button Content="Показать" Click="Button_Click" Height="25" Width="79" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="8,0,8,8"/>
+        <TextBlock x:Name="ErrorTextBlock" Width="484" TextWrapping="Wrap" DockPanel.Dock="Top" Margin="8,0,8,8"/>
 
         
        
