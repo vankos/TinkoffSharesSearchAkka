@@ -117,8 +117,26 @@ namespace Tinkoff
                 diff.Columns.Add("Name");
                 diff.Columns.Add("Change", typeof(decimal));
                 diff.Columns.Add("Линейность");
+                diff.Columns.Add("Стоп-лосс");
                 diff.Columns.Add("Zacks рейтинг");
                 int failedInstrumentCount = 0;
+
+                Portfolio portfolio = await context.PortfolioAsync();
+                PortfolioCurrencies portfolioCurrencies = await context.PortfolioCurrenciesAsync();
+
+                decimal rubles = portfolioCurrencies.Currencies.Find(balanceCurr => balanceCurr.Currency == Currency.Rub).Balance;
+                decimal usdPrice = portfolio.Positions.First(pos => pos.Ticker == "USD000UTSTOM").AveragePositionPrice.Value;
+                decimal portfolioCost= portfolio.Positions.Select(pos =>
+                      {
+                          if (pos.AveragePositionPrice.Currency == Currency.Usd)
+                              return pos.AveragePositionPrice.Value*pos.Balance;
+                          else
+                              return (pos.AveragePositionPrice.Value * pos.Balance )/ usdPrice;
+                      }).Sum()+ rubles/ usdPrice;
+
+                if (curr == Currency.Rub)
+                    portfolioCost *= usdPrice;
+
                 foreach (var instrument in markertlist.Instruments.Where((i) => i.Currency == curr))
                 {
                     try
@@ -131,9 +149,10 @@ namespace Tinkoff
                             string name = instrument.Name;
                             decimal growth = Math.Round((candles[0].Open - candles.Last().Close) / candles.Last().Close * 100, 2) * -1;
                             decimal linearity = GetMadeUpCoeff(candles);
+                            decimal stoploss = CalcStopLoss(portfolioCost, candles.Last().Close, priceLimit);
                             string zacksScore= "";//linearity<(decimal)0.5 && curr!=Currency.Rub && growth>0? await GetZacksScore(instrument.Ticker):"";
                             if((!filterNonLinear.IsChecked??false)|| linearity < (decimal)0.5)
-                                diff.Rows.Add(name, growth, linearity.ToString("n2"),zacksScore);
+                                diff.Rows.Add(name, growth, linearity.ToString("n2"), stoploss,zacksScore);
                         }
                     }
                     catch (Exception e)
@@ -154,6 +173,12 @@ namespace Tinkoff
             {
                 ErrorTextBlock.Text=e.Message;
             }
+        }
+
+        private decimal CalcStopLoss(decimal portfolioCost, decimal close, decimal priceLimit)
+        {
+            decimal acceptableLoseForShare = (portfolioCost * (decimal)0.015)/ (decimal.Round(priceLimit/close));
+            return close - acceptableLoseForShare;
         }
 
         private decimal GetMadeUpCoeff(List<CandlePayload> candles)
