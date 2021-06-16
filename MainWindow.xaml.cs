@@ -14,6 +14,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
+using System.ComponentModel;
 
 namespace Tinkoff
 {
@@ -31,13 +32,11 @@ namespace Tinkoff
         {
             IsInitializing = true;
             InitializeComponent();
-            savedata= SaveData.GetSaveData();
+            savedata = SaveData.GetSaveData(saveFilePath);
+            DataContext = savedata;
             TokenTextEdit.Text = savedata.Token+"";
-            MoneyLimit.Text = savedata.MoneyLimitValue + "";
             USDRadioButton.IsChecked = savedata.Currency == Currency.Usd;
             RubRadioButton.IsChecked = savedata.Currency == Currency.Rub;
-            StartDate.SelectedDate = savedata.StartDate;
-            EndDate.SelectedDate = savedata.EndDate;
             try
             {
                 context = GetContext(savedata.Token);
@@ -52,29 +51,10 @@ namespace Tinkoff
             EndDate.SelectedDate = DateTime.Now;
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (IsInitializing) return;
-            try
-            {
-                var price = MoneyLimit.Text.Replace('.', ',');
-                savedata.MoneyLimitValue = decimal.Parse(price);
-                savedata.Save();
-                ErrorTextBlock.Text = "";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"При изменении лимита произошла ошибка: {ex.Message}");
-            }
-        }
-
         private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
         {
-            if (IsInitializing) return;
             try
             {
-                savedata.Token = TokenTextEdit.Text;
-                savedata.Save();
                 context = GetContext(savedata.Token);
                 ErrorTextBlock.Text = "";
             }
@@ -214,40 +194,6 @@ namespace Tinkoff
 
         }
 
-        [Serializable]
-        private class SaveData
-        {
-            public string Token { get; set; }
-            public decimal MoneyLimitValue { get; set; }
-            public Currency Currency { get; set; }
-            public DateTime StartDate { get; set; }
-            public DateTime EndDate { get; set; }
-            public static SaveData GetSaveData()
-            {
-                try
-                {
-                    using (FileStream fs = File.OpenRead(saveFilePath))
-                    {
-                        BinaryFormatter bf = new BinaryFormatter();
-                        return (SaveData)bf.Deserialize(fs);
-                    }
-                }
-                catch (Exception)
-                {
-                    return new SaveData();
-                }
-            }
-
-            public void Save()
-            {
-                using (FileStream fs = File.OpenWrite(saveFilePath))
-                {
-                    BinaryFormatter bf = new BinaryFormatter();
-                    bf.Serialize(fs, this);
-                }
-            }
-        }
-
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             ErrorTextBlock.Text = "";
@@ -259,21 +205,46 @@ namespace Tinkoff
         {
             if (IsInitializing) return;
             savedata.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
-            savedata.Save();
+            savedata.Save(saveFilePath);
         }
 
-        private void DatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (IsInitializing) return;
-            savedata.StartDate = StartDate.SelectedDate.GetValueOrDefault();
-            savedata.Save();
+            savedata.Save(saveFilePath);
+        }
+    }
+
+    [Serializable]
+    public class SaveData
+    {
+        public string Token { get; set; }
+        public decimal MoneyLimitValue { get; set; }
+        public Currency Currency { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public static SaveData GetSaveData(string saveFilePath)
+        {
+            try
+            {
+                using (FileStream fs = File.OpenRead(saveFilePath))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    return (SaveData)bf.Deserialize(fs);
+                }
+            }
+            catch (Exception)
+            {
+                return new SaveData();
+            }
         }
 
-        private void EndDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        public void Save(string saveFilePath)
         {
-            if (IsInitializing) return;
-            savedata.EndDate = ((DateTime)e.AddedItems[0]).AddDays(1) > DateTime.Now ? DateTime.Now : ((DateTime)e.AddedItems[0]).AddDays(1);
-            savedata.Save();
+            using (FileStream fs = File.OpenWrite(saveFilePath))
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(fs, this);
+            }
         }
     }
 }
