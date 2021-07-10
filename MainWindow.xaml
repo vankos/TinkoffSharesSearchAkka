@@ -11,6 +11,9 @@
     <Window.DataContext>
         <local:SaveData/>
     </Window.DataContext>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.ShowCommand}" Executed="ShowCommand_Executed"/>
+    </Window.CommandBindings>
     <DockPanel LastChildFill="True" Margin="8,0,8,8">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,9,8,8">
             <Label Content="Максимальная цена акции"/>
@@ -28,11 +31,7 @@
         <DataGrid x:Name="DataDataGrid"  DockPanel.Dock="Top" Height="400" Margin="8,0,8,8"/>
         <Label x:Name="TokenTextBox" Content="Вставь свой токен ниже:" DockPanel.Dock="Top" Margin="8,0,8,0"/>
         <TextBox x:Name="TokenTextEdit" Height="30" TextWrapping="Wrap" Width="482" TextChanged="TextBox_TextChanged_1" DockPanel.Dock="Top" Margin="8,0,8,8" Text="{Binding Token}"/>
-        <Button Content="Показать" Click="Button_Click" Height="25" Width="79" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="8,0,8,8"/>
+        <Button Content="Показать" Height="25" Width="79" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="8,0,8,8" Command="{x:Static local:MainWindow.ShowCommand}"/>
         <TextBlock x:Name="ErrorTextBlock" Width="484" TextWrapping="Wrap" DockPanel.Dock="Top" Margin="8,0,8,8"/>
-
-        
-       
-
     </DockPanel>
 </Window>

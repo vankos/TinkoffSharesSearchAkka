@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace Tinkoff
 {
@@ -23,6 +24,7 @@ namespace Tinkoff
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static RoutedCommand ShowCommand { get; set; } = new RoutedCommand();
         private const string saveFilePath = "savedData.dat";
         private Context context;
         private readonly SaveData savedata;
@@ -32,6 +34,8 @@ namespace Tinkoff
         {
             IsInitializing = true;
             InitializeComponent();
+            ShowCommand.InputGestures.Add(new KeyGesture(Key.Enter, ModifierKeys.None));
+
             savedata = SaveData.GetSaveData(saveFilePath);
             DataContext = savedata;
             TokenTextEdit.Text = savedata.Token+"";
@@ -194,13 +198,6 @@ namespace Tinkoff
 
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-            ErrorTextBlock.Text = "";
-            if (context != null)
-                await GetPriceChange(context, savedata.Currency,savedata.StartDate, savedata.EndDate);
-        }
-
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             if (IsInitializing) return;
@@ -212,6 +209,14 @@ namespace Tinkoff
         {
             savedata.Save(saveFilePath);
         }
+
+        private async void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ErrorTextBlock.Text = "";
+            if (context != null)
+                await GetPriceChange(context, savedata.Currency, savedata.StartDate, savedata.EndDate);
+        }
+        
     }
 
     [Serializable]
