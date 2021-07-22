@@ -135,7 +135,7 @@ namespace Tinkoff
                             decimal linearity = GetMadeUpCoeff(candles);
                             decimal stoploss = CalcStopLoss(portfolioCost, candles.Last().Close, priceLimit);
                             string zacksScore= "";//linearity<(decimal)0.5 && curr!=Currency.Rub && growth>0? await GetZacksScore(instrument.Ticker):"";
-                            if((!filterNonLinear.IsChecked??false)|| linearity < (decimal)0.5)
+                            if((!filterNonLinear.IsChecked??false)|| linearity < savedata.Linearity)
                                 diff.Rows.Add(name, growth, linearity.ToString("n2"), stoploss,zacksScore);
                         }
                     }
@@ -227,6 +227,7 @@ namespace Tinkoff
         public Currency Currency { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public decimal Linearity { get; set; }
         public static SaveData GetSaveData(string saveFilePath)
         {
             try
