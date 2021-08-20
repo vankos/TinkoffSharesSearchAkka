@@ -4,7 +4,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    
     <ProjectGuid>{E625E07F-B438-475F-B088-C45F4F6C890E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Tinkoff</RootNamespace>

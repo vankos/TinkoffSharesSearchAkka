@@ -1,0 +1,42 @@
+﻿<Window x:Class="Tinkoff.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Tinkoff"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance local:SaveData}"
+        Title="MainWindow" Height="750" Width="523.335" Padding="5"
+        Closing="Window_Closing">
+    <Window.DataContext>
+        <local:SaveData/>
+    </Window.DataContext>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:MainWindow.ShowCommand}" Executed="ShowCommand_Executed"/>
+    </Window.CommandBindings>
+    <DockPanel LastChildFill="True" Margin="8,0,8,8">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,9,8,8">
+            <Label Content="Максимальная цена акции"/>
+            <TextBox x:Name="MoneyLimit" Width="150" Margin="8,0,8,8" Text="{Binding MoneyLimitValue}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
+            <RadioButton x:Name="USDRadioButton" Content="USD"  Width="44" IsChecked="True" GroupName="Currency" Checked="RubRadioButton_Checked"/>
+            <RadioButton x:Name="RubRadioButton" Content="RUB" Width="44" Checked="RubRadioButton_Checked" GroupName="Currency"/>
+        </StackPanel>
+        <StackPanel  Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
+            <DatePicker x:Name="StartDate"   Width="95" SelectedDate="{Binding StartDate}"/>
+            <DatePicker x:Name="EndDate" Width="95" SelectedDate="{Binding EndDate}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
+            <CheckBox x:Name="filterNonLinear" Content="не показывать с низкой линейностью" IsChecked="True" DockPanel.Dock="Top" Margin="8,8,8,8"/>
+            <Label Content="Линейность"/>
+            <TextBox x:Name="linearity" Width="50" Margin="0,8" Text="{Binding Linearity}" />
+            <Label Content="%"/>
+        </StackPanel>
+        <DataGrid x:Name="DataDataGrid"  DockPanel.Dock="Top" Height="400" Margin="8,0,8,8"/>
+        <Label x:Name="TokenTextBox" Content="Вставь свой токен ниже:" DockPanel.Dock="Top" Margin="8,0,8,0"/>
+        <TextBox x:Name="TokenTextEdit" Height="30" TextWrapping="Wrap" Width="482" TextChanged="TextBox_TextChanged_1" DockPanel.Dock="Top" Margin="8,0,8,8" Text="{Binding Token}"/>
+        <Button Content="Показать" Height="25" Width="79" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="8,0,8,8" Command="{x:Static local:MainWindow.ShowCommand}"/>
+        <TextBlock x:Name="ErrorTextBlock" Width="484" TextWrapping="Wrap" DockPanel.Dock="Top" Margin="8,0,8,8"/>
+    </DockPanel>
+</Window>
