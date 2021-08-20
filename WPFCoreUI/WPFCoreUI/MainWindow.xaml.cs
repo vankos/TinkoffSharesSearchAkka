@@ -12,11 +12,7 @@ using Tinkoff.Trading.OpenApi.Models;
 using System.Data;
 using System.Net;
 using System.Text.RegularExpressions;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.ComponentModel;
 using System.Windows.Input;
-using WPFController;
-using System.Xml;
 using Notifications.Wpf.Core;
 
 namespace Tinkoff
@@ -27,9 +23,7 @@ namespace Tinkoff
     public partial class MainWindow : Window
     {
         public static RoutedCommand ShowCommand { get; set; } = new RoutedCommand();
-        private const string saveFilePath = "savedData.dat";
         private Context context;
-        private readonly SaveData savedata;
         private readonly bool IsInitializing;
         private WPFController.WPFController controller;
         public MainWindow()
@@ -40,14 +34,13 @@ namespace Tinkoff
             
             ShowCommand.InputGestures.Add(new KeyGesture(Key.Enter, ModifierKeys.None));
 
-            savedata = SaveData.GetSaveData(saveFilePath);
-            DataContext = savedata;
-            TokenTextEdit.Text = savedata.Token + "";
-            USDRadioButton.IsChecked = savedata.Currency == Currency.Usd;
-            RubRadioButton.IsChecked = savedata.Currency == Currency.Rub;
+            DataContext = controller.UserData;
+            TokenTextEdit.Text = controller.UserData.Token + "";
+            USDRadioButton.IsChecked = controller.UserData.Currency == Currency.Usd;
+            RubRadioButton.IsChecked = controller.UserData.Currency == Currency.Rub;
             try
             {
-                context = GetContext(savedata.Token);
+                context = GetContext(controller.UserData.Token);
                 ErrorTextBlock.Text = "";
             }
             catch (Exception)
@@ -63,7 +56,7 @@ namespace Tinkoff
         {
             try
             {
-                context = GetContext(savedata.Token);
+                context = GetContext(controller.UserData.Token);
                 ErrorTextBlock.Text = "";
             }
             catch (Exception)
@@ -99,7 +92,7 @@ namespace Tinkoff
             try
             {
                 ErrorTextBlock.Text = "Идет загрузка";
-                decimal priceLimit = savedata.MoneyLimitValue;
+                decimal priceLimit = controller.UserData.MoneyLimitValue;
                 MarketInstrumentList markertlist = await context.MarketStocksAsync();
                 DataTable diff = new DataTable();
                 diff.Columns.Add("Name");
@@ -139,7 +132,7 @@ namespace Tinkoff
                             decimal linearity = GetMadeUpCoeff(candles);
                             decimal stoploss = CalcStopLoss(portfolioCost, candles.Last().Close, priceLimit);
                             string zacksScore = "";//linearity<(decimal)0.5 && curr!=Currency.Rub && growth>0? await GetZacksScore(instrument.Ticker):"";
-                            if ((!filterNonLinear.IsChecked ?? false) || linearity < savedata.Linearity)
+                            if ((!filterNonLinear.IsChecked ?? false) || linearity < controller.UserData.Linearity)
                                 diff.Rows.Add(name, growth, linearity.ToString("n2"), stoploss, zacksScore);
                         }
                     }
@@ -208,20 +201,19 @@ namespace Tinkoff
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             if (IsInitializing) return;
-            savedata.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
-            savedata.Save(saveFilePath);
+            controller.UserData.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            savedata.Save(saveFilePath);
+            controller.SaveUserData();
         }
 
         private async void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ErrorTextBlock.Text = "";
             if (context != null)
-                await GetPriceChange(context, savedata.Currency, savedata.StartDate, savedata.EndDate);
+                await GetPriceChange(context, controller.UserData.Currency, controller.UserData.StartDate, controller.UserData.EndDate);
         }
 
     }
