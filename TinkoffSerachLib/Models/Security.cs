@@ -13,7 +13,7 @@ namespace TinkoffSerachLib.Models
         public decimal Growth { get; set; }
         public decimal Linearity { get; set; }
 
-        public HashSet<CandlePayload> candles { get; set;}
+        public List<CandlePayload> Candles { get; set;}
 
     }
 }

@@ -177,27 +177,6 @@ namespace Tinkoff
             return diffs.Sum();
         }
 
-        private async Task<string> GetZacksScore(string secCode)
-        {
-            MatchCollection matches;
-            using (WebClient client = new WebClient())
-            {
-                string htmlCode = await client.DownloadStringTaskAsync($"https://zacks.com/stock/quote/{secCode}");
-                matches = Regex.Matches(htmlCode, " <p class=\"rank_view\">\\n\\s*(\\d.*?)<span");
-            }
-
-            if (matches.Count > 0)
-            {
-                if (matches[0].Groups.Count > 1)
-                    return matches[0].Groups[1].Value;
-
-            }
-            return string.Empty;
-
-
-
-        }
-
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             if (IsInitializing) return;
