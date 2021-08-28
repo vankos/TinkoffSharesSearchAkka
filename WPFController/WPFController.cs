@@ -11,12 +11,15 @@ namespace WPFController
         public UserData UserData { get; set; }
         public List<Security> UnflteredData = new List<Security>();
         private GetDataService getDataService;
+        public  event EventHandler<string> OnMessageRecived;
+        public  event EventHandler<string> OnNotificationMessageRecived;
 
 
         public WPFController()
         {
             UserData =  SaveService.LoadData();
-            
+            MessageService.OnMessageRecived += (o, e) => OnMessageRecived.Invoke(o, e);
+            MessageService.OnNotificationMessageRecived += (o, e) => OnNotificationMessageRecived.Invoke(o, e);
         }
 
         public void SaveUserData()

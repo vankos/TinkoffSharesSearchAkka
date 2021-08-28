@@ -30,6 +30,19 @@ namespace Tinkoff
         {
             IsInitializing = true;
             controller = new WPFController.WPFController();
+            controller.OnMessageRecived += (_, e) =>TokenTextEdit.Text = e;
+            controller.OnMessageRecived += (_, e) =>
+            {
+                TokenTextEdit.Text = e;
+                var notificationManager = new NotificationManager();
+                notificationManager.ShowAsync(new NotificationContent
+                {
+                    Title = "Tinkoff shares",
+                    Message = e,
+                    Type = NotificationType.Success
+                });
+            };
+            
             InitializeComponent();
             
             ShowCommand.InputGestures.Add(new KeyGesture(Key.Enter, ModifierKeys.None));
