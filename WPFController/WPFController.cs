@@ -18,8 +18,8 @@ namespace WPFController
         public WPFController()
         {
             UserData =  SaveService.LoadData();
-            MessageService.OnMessageRecived += (o, e) => OnMessageRecived.Invoke(o, e);
-            MessageService.OnNotificationMessageRecived += (o, e) => OnNotificationMessageRecived.Invoke(o, e);
+            MessageService.OnMessageRecived += (o, e) => OnMessageRecived?.Invoke(o, e);
+            MessageService.OnNotificationMessageRecived += (o, e) => OnNotificationMessageRecived?.Invoke(o, e);
         }
 
         public void SaveUserData()
@@ -29,7 +29,6 @@ namespace WPFController
 
         async public Task<List<Security>> GetData()
         {
-             MessageService.SendMessage("", false);
             if (UserData.Token == null && getDataService is null)
             {
                 MessageService.SendMessage("Нет токена", false);
@@ -39,12 +38,21 @@ namespace WPFController
             {
                 if (getDataService is null)
                     getDataService = new GetDataService(UserData.Token);
-                return await getDataService.GetCandlesForAllSharesOnDate(UserData.StartDate, UserData.EndDate, UserData.Currency);
+                UnflteredData = await getDataService.GetCandlesForAllSharesOnDate(UserData.StartDate, UserData.EndDate, UserData.Currency);
+                return UnflteredData;
             }
             catch (Exception)
             {
                 return null;
             }
+        }
+
+        async public Task<List<Security>> GetAndFilterData()
+        {
+            var data = await GetData();
+            AnalyticalService.GetGrowth(data);
+            AnalyticalService.GetLinearity(data);
+            return data;
         }
     }
 }
