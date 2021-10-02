@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TinkoffSerachLib.Models;
 using TinkoffSerachLib.Services;
@@ -13,6 +14,7 @@ namespace WPFController
         private GetDataService getDataService;
         public  event EventHandler<string> OnMessageRecived;
         public  event EventHandler<string> OnNotificationMessageRecived;
+        public  event EventHandler<List<Security>> OnViewDataChanged;
 
 
         public WPFController()
@@ -20,6 +22,8 @@ namespace WPFController
             UserData =  SaveService.LoadData();
             MessageService.OnMessageRecived += (o, e) => OnMessageRecived?.Invoke(o, e);
             MessageService.OnNotificationMessageRecived += (o, e) => OnNotificationMessageRecived?.Invoke(o, e);
+            UserData.OnLinearityChanged += (_, _) => FilterData();
+            UserData.OnMoneyLimitValueChanged += (_, _) => FilterData();
         }
 
         public void SaveUserData()
@@ -27,32 +31,32 @@ namespace WPFController
             SaveService.SaveData(UserData);
         }
 
-        async public Task<List<Security>> GetData()
+        async public Task GetData()
         {
             if (UserData.Token == null && getDataService is null)
             {
                 MessageService.SendMessage("Нет токена", false);
-                throw new ApplicationException("Нет токена");
+                return;
             }
             try
             {
                 if (getDataService is null)
                     getDataService = new GetDataService(UserData.Token);
                 UnflteredData = await getDataService.GetCandlesForAllSharesOnDate(UserData.StartDate, UserData.EndDate, UserData.Currency);
-                return UnflteredData;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                MessageService.SendMessage($"Ошибка получения данных:{ex.Message}", false);
             }
         }
 
-        async public Task<List<Security>> GetAndFilterData()
+        public void FilterData()
         {
-            var data = await GetData();
-            AnalyticalService.GetGrowth(data);
-            AnalyticalService.GetLinearity(data);
-            return data;
+            var result = AnalyticalService.GetLinearity(AnalyticalService.GetGrowth(UnflteredData))
+              .Where(s => s.Linearity <= UserData.Linearity
+              && s.Candles.Last().Close <= UserData.MoneyLimit)
+              .ToList();
+            OnViewDataChanged?.Invoke(this,result);
         }
     }
 }

@@ -9,6 +9,7 @@ namespace TinkoffSerachLib.Services
     {
         public static List<Security> GetGrowth(List<Security> securities)
         {
+            securities = securities.ToList();
             foreach (var security in securities)
             {
                security.Growth = Math.Round((security.Candles.Last().Close - security.Candles[0].Open) / security.Candles.Last().Close * 100, 2);
@@ -18,6 +19,7 @@ namespace TinkoffSerachLib.Services
 
         public static List<Security> GetLinearity(List<Security> securities)
         {
+            securities = securities.ToList();
             foreach (var security in securities)
             {
                 decimal k = (security.Candles.Last().Close - security.Candles[0].Close) / security.Candles.Count;

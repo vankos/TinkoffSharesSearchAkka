@@ -13,7 +13,7 @@
     <DockPanel LastChildFill="True" Margin="8,0,8,8">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,9,8,8">
             <Label Content="Максимальная цена акции"/>
-            <TextBox x:Name="MoneyLimit" Width="150" Margin="8,0,8,8" Text="{Binding MoneyLimitValue}" />
+            <TextBox x:Name="MoneyLimit" Width="150" Margin="8,0,8,8" Text="{Binding MoneyLimit}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
             <RadioButton x:Name="USDRadioButton" Content="USD"  Width="44" IsChecked="True" GroupName="Currency" Checked="RubRadioButton_Checked"/>
@@ -24,12 +24,17 @@
             <DatePicker x:Name="EndDate" Width="95" SelectedDate="{Binding EndDate}"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8,0,8,8">
-            <CheckBox x:Name="filterNonLinear" Content="не показывать с низкой линейностью" IsChecked="True" DockPanel.Dock="Top" Margin="8,8,8,8"/>
             <Label Content="Линейность"/>
-            <TextBox x:Name="linearity" Width="50" Margin="0,8" Text="{Binding Linearity}" />
+            <TextBox x:Name="linearity" Width="50" Margin="0,8" Text="{Binding Linearity}"/>
             <Label Content="%"/>
         </StackPanel>
-        <DataGrid x:Name="DataDataGrid"  DockPanel.Dock="Top" Height="400" Margin="8,0,8,8"/>
+        <DataGrid x:Name="DataDataGrid"  DockPanel.Dock="Top" Height="400" Margin="8,0,8,8">
+            <!--<DataGrid.Columns>
+                <DataGridTextColumn Header="Имя" Binding="{Binding Item.Name, Mode=OneWay}" Width="*"/>
+                <DataGridTextColumn Header="Рост" Binding="{Binding Item.Growth, Mode=OneWay}" Width="*"/>
+                <DataGridTextColumn Header="Нелинейность" Binding="{Binding Item.Linearity, Mode=OneWay}" Width="*"/>
+            </DataGrid.Columns>-->
+        </DataGrid>
         <Label x:Name="TokenTextBox" Content="Вставь свой токен ниже:" DockPanel.Dock="Top" Margin="8,0,8,0"/>
         <TextBox x:Name="TokenTextEdit" Height="30" TextWrapping="Wrap" Width="482"  DockPanel.Dock="Top" Margin="8,0,8,8" Text="{Binding Token}"/>
         <Button Content="Показать" Height="25" Width="79" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="8,0,8,8" Command="{x:Static local:MainWindow.ShowCommand}"/>

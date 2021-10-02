@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
 using TinkoffSerachLib.Models;
 
 namespace TinkoffSerachLib.Services
@@ -11,22 +11,14 @@ namespace TinkoffSerachLib.Services
 
         static public void SaveData(UserData userData, string filelocation = SAVEFILEPATH)
         {
-            using (FileStream fs = File.OpenWrite(filelocation))
-            {
-                BinaryFormatter bf = new BinaryFormatter();
-                bf.Serialize(fs, userData);
-            }
+           File.WriteAllText(filelocation,JsonSerializer.Serialize<UserData>(userData));
         }
 
         public static UserData LoadData(string filelocation = SAVEFILEPATH)
         {
             try
             {
-                using (FileStream fs = File.OpenRead(filelocation))
-                {
-                    BinaryFormatter bf = new BinaryFormatter();
-                    return (UserData)bf.Deserialize(fs);
-                }
+                    return JsonSerializer.Deserialize<UserData>(File.ReadAllText(filelocation));
             }
             catch (Exception)
             {

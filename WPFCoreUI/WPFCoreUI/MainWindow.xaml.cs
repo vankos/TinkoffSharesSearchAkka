@@ -24,13 +24,12 @@ namespace Tinkoff
     public partial class MainWindow : Window
     {
         public static RoutedCommand ShowCommand { get; set; } = new RoutedCommand();
-        private readonly bool IsInitializing;
         private WPFController.WPFController controller;
         public MainWindow()
         {
             controller = new WPFController.WPFController();
             controller.OnMessageRecived += (_, e) =>ErrorTextBlock.Text = e;
-            controller.OnMessageRecived += (_, e) =>
+            controller.OnNotificationMessageRecived += (_, e) =>
             {
                 ErrorTextBlock.Text = e;
                 var notificationManager = new NotificationManager();
@@ -41,7 +40,8 @@ namespace Tinkoff
                     Type = NotificationType.Success
                 });
             };
-            
+            controller.OnViewDataChanged += (_, data) => DataDataGrid.ItemsSource = data;
+
             InitializeComponent();
             
             ShowCommand.InputGestures.Add(new KeyGesture(Key.Enter, ModifierKeys.None));
@@ -56,7 +56,6 @@ namespace Tinkoff
 
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            if (IsInitializing) return;
             controller.UserData.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
         }
 
@@ -67,9 +66,15 @@ namespace Tinkoff
 
         private async void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ErrorTextBlock.Text = "Загрузка данных";
-            DataDataGrid.ItemsSource = await controller.GetAndFilterData();
+            MessageBoxResult messageBoxResult= MessageBoxResult.Yes;
+            if (controller.UnflteredData.Count != 0)
+                messageBoxResult = MessageBox.Show("Зарузить данные заново?", "Зарузить данные?", MessageBoxButton.YesNo);
+            if (controller.UnflteredData.Count == 0 || messageBoxResult == MessageBoxResult.Yes)
+            {
+                ErrorTextBlock.Text = "Загрузка данных";
+                await controller.GetData();
+                controller.FilterData();
+            }
         }
-
     }
 }
