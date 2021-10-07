@@ -12,7 +12,7 @@ namespace TinkoffSearchLib.Services
             securities = securities.ToList();
             foreach (var security in securities)
             {
-               security.Growth = Math.Round((security.Candles.Last().Close - security.Candles[0].Open) / security.Candles.Last().Close * 100, 2);
+               security.Growth = Math.Round((security.Candles.Last().Close - security.Candles[0].Open) / security.Candles.First().Open * 100, 2);
             }
             return securities;
         }
@@ -22,14 +22,17 @@ namespace TinkoffSearchLib.Services
             securities = securities.ToList();
             foreach (var security in securities)
             {
-                decimal k = (security.Candles.Last().Close - security.Candles[0].Close) / security.Candles.Count;
-                decimal b = security.Candles[0].Close;
+                decimal k = (security.Candles.Last().Close - security.Candles[0].Open) / security.Candles.Count;
+                decimal b = security.Candles[0].Open;
                 List<decimal> diffs = new();
                 for (int x = 1; x <= security.Candles.Count; x++)
                 {
-                    diffs.Add(Math.Abs(security.Candles[x - 1].Close - ((k * x) + b)) / ((k * x) + b));
+                        if(x==1|| x == security.Candles.Count)
+                            diffs.Add(0);
+                        else
+                            diffs.Add(Math.Abs((security.Candles[x - 1].Close + security.Candles[x - 1].Open) / 2 - ((k * x) + b)) / ((k * x) + b));
                 }
-                security.Linearity = diffs.Sum();
+                security.Linearity = diffs.Max()*100;
             }
             return securities;
         }
