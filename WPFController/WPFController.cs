@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TinkoffSerachLib.Models;
-using TinkoffSerachLib.Services;
+using TinkoffSearchLib.Models;
+using TinkoffSearchLib.Services;
 
 namespace WPFController
 {

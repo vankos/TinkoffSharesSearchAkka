@@ -1,7 +1,7 @@
 ﻿using System;
 using Tinkoff.Trading.OpenApi.Models;
 
-namespace TinkoffSerachLib.Models
+namespace TinkoffSearchLib.Models
 {
     [Serializable]
     public class UserData

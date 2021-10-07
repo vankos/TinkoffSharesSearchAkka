@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tinkoff.Trading.OpenApi.Models;
 using Tinkoff.Trading.OpenApi.Network;
-using TinkoffSerachLib.Models;
+using TinkoffSearchLib.Models;
 
-namespace TinkoffSerachLib.Services
+namespace TinkoffSearchLib.Services
 {
     public class GetDataService
     {

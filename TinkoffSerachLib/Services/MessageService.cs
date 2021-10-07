@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinkoffSerachLib.Services
+namespace TinkoffSearchLib.Services
 {
     public static class MessageService
     {

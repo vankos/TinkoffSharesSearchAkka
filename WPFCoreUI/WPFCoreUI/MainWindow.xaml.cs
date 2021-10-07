@@ -14,7 +14,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Notifications.Wpf.Core;
-using TinkoffSerachLib.Models;
+using TinkoffSearchLib.Models;
 
 namespace Tinkoff
 {

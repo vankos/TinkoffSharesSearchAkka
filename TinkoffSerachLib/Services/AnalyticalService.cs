@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TinkoffSerachLib.Models;
+using TinkoffSearchLib.Models;
 
-namespace TinkoffSerachLib.Services
+namespace TinkoffSearchLib.Services
 {
     public static class AnalyticalService
     {

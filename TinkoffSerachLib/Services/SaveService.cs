@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
-using TinkoffSerachLib.Models;
+using TinkoffSearchLib.Models;
 
-namespace TinkoffSerachLib.Services
+namespace TinkoffSearchLib.Services
 {
     static public class SaveService
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tinkoff.Trading.OpenApi.Models;
 
-namespace TinkoffSerachLib.Models
+namespace TinkoffSearchLib.Models
 {
     public class Security
     {
