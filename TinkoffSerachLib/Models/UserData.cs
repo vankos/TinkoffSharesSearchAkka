@@ -8,7 +8,7 @@ namespace TinkoffSearchLib.Models
     {
         private decimal moneyLimitValue;
         private decimal linearity;
-        
+
         public Currency Currency { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -16,8 +16,8 @@ namespace TinkoffSearchLib.Models
         public decimal MoneyLimit
         {
             get { return moneyLimitValue; }
-            set 
-            { 
+            set
+            {
                 moneyLimitValue = value;
                 OnMoneyLimitValueChanged?.Invoke(this, value);
             }
@@ -26,8 +26,8 @@ namespace TinkoffSearchLib.Models
         public decimal Linearity
         {
             get { return linearity; }
-            set 
-            { 
+            set
+            {
                 linearity = value;
                 OnLinearityChanged?.Invoke(this, value);
             }
@@ -35,6 +35,5 @@ namespace TinkoffSearchLib.Models
 
         public event EventHandler<decimal> OnMoneyLimitValueChanged;
         public event EventHandler<decimal> OnLinearityChanged;
-
     }
 }

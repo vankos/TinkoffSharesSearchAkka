@@ -24,10 +24,10 @@ namespace Tinkoff
     public partial class MainWindow : Window
     {
         public static RoutedCommand ShowCommand { get; set; } = new RoutedCommand();
-        private WPFController.WPFController controller;
+        private readonly WPFController.WpfController controller;
         public MainWindow()
         {
-            controller = new WPFController.WPFController();
+            controller = new WPFController.WpfController();
             controller.OnMessageRecived += (_, e) =>ErrorTextBlock.Text = e;
             controller.OnNotificationMessageRecived += (_, e) =>
             {
@@ -43,7 +43,7 @@ namespace Tinkoff
             controller.OnViewDataChanged += (_, data) => DataDataGrid.ItemsSource = data;
 
             InitializeComponent();
-            
+
             ShowCommand.InputGestures.Add(new KeyGesture(Key.Enter, ModifierKeys.None));
 
             DataContext = controller.UserData;

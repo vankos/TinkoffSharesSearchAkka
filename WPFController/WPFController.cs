@@ -7,17 +7,16 @@ using TinkoffSearchLib.Services;
 
 namespace WPFController
 {
-    public class WPFController
+    public class WpfController
     {
         public UserData UserData { get; set; }
-        public List<Security> UnflteredData = new List<Security>();
+        public List<Security> UnflteredData { get; set; } = new();
         private GetDataService getDataService;
         public  event EventHandler<string> OnMessageRecived;
         public  event EventHandler<string> OnNotificationMessageRecived;
         public  event EventHandler<List<Security>> OnViewDataChanged;
 
-
-        public WPFController()
+        public WpfController()
         {
             UserData =  SaveService.LoadData();
             MessageService.OnMessageRecived += (o, e) => OnMessageRecived?.Invoke(o, e);

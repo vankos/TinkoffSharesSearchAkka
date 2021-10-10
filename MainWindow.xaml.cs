@@ -116,7 +116,7 @@ namespace Tinkoff
                               return pos.AveragePositionPrice.Value*pos.Balance;
                           else
                               return (pos.AveragePositionPrice.Value * pos.Balance )/ usdPrice;
-                      }).Sum()+ rubles/ usdPrice;
+                      }).Sum()+ (rubles / usdPrice);
 
                 if (curr == Currency.Rub)
                     portfolioCost *= usdPrice;
@@ -129,7 +129,6 @@ namespace Tinkoff
                         List<CandlePayload> candles = (await context.MarketCandlesAsync(instrument.Figi, DateTime.SpecifyKind(startDate, DateTimeKind.Local), DateTime.SpecifyKind(endDate, DateTimeKind.Local), interval)).Candles;
                         if (candles.Count > 0 && candles.Last().Close < priceLimit)
                         {
-
                             string name = instrument.Name;
                             decimal growth = Math.Round((candles[0].Open - candles.Last().Close) / candles.Last().Close * 100, 2) * -1;
                             decimal linearity = GetMadeUpCoeff(candles);
@@ -172,7 +171,7 @@ namespace Tinkoff
             List<decimal> diffs = new List<decimal>();
             for (int x = 1; x <= candles.Count; x++)
             {
-                diffs.Add(Math.Abs(candles[x - 1].Close-(k * x+b))/ (k * x + b));
+                diffs.Add(Math.Abs(candles[x - 1].Close-((k * x) + b))/ ((k * x) + b));
             }
             return diffs.Sum();
         }
@@ -190,12 +189,8 @@ namespace Tinkoff
             {
                 if(matches[0].Groups.Count>1)
                     return matches[0].Groups[1].Value;
-                
             }
             return string.Empty;
-            
-
-
         }
 
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -216,7 +211,6 @@ namespace Tinkoff
             if (context != null)
                 await GetPriceChange(context, savedata.Currency, savedata.StartDate, savedata.EndDate);
         }
-        
     }
 
     [Serializable]

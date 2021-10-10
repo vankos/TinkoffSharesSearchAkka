@@ -14,6 +14,5 @@ namespace TinkoffSearchLib.Models
         public decimal Linearity { get; set; }
 
         public List<CandlePayload> Candles { get; set;}
-
     }
 }

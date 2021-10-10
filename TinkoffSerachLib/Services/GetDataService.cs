@@ -26,22 +26,25 @@ namespace TinkoffSearchLib.Services
             }
         }
 
-        public async Task<List<Security>> GetCandlesForAllSharesOnDate(DateTime startDate, DateTime endDate, Currency currency)
+        public Task<List<Security>> GetCandlesForAllSharesOnDate(DateTime startDate, DateTime endDate, Currency currency)
         {
             if (startDate > endDate)
                 throw new ArgumentException("Первая дата больше второй");
 
+            return GetCandlesForAllSharesOnDateInternal(startDate, endDate, currency);
+        }
+
+        private async Task<List<Security>> GetCandlesForAllSharesOnDateInternal(DateTime startDate, DateTime endDate, Currency currency)
+        {
             CandleInterval interval = CandleInterval.Week;
             if ((endDate - startDate).TotalDays <= 7) interval = CandleInterval.Hour;
             else if ((endDate - startDate).TotalDays <= 90) interval = CandleInterval.Day;
             try
             {
                 MarketInstrumentList markertlist = await context.MarketStocksAsync();
-                Portfolio portfolio = await context.PortfolioAsync();
-                PortfolioCurrencies portfolioCurrencies = await context.PortfolioCurrenciesAsync();
 
                 int failedInstrumentsCounter = 0;
-                List<Security> securities = new List<Security>();
+                List<Security> securities = new();
                 foreach (var instrument in markertlist.Instruments.Where((i) => i.Currency == currency))
                 {
                     try
@@ -57,7 +60,7 @@ namespace TinkoffSearchLib.Services
                             });
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         failedInstrumentsCounter++;
                     }
