@@ -3,15 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinkoffUI", "TinkoffUI.csproj", "{E625E07F-B438-475F-B088-C45F4F6C890E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinkoffSearchLib", "TinkoffSerachLib\TinkoffSearchLib.csproj", "{324B832A-6474-415A-B754-35363E66B3E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFController", "WPFController\WPFController.csproj", "{31063B99-9633-407B-8541-0FEC5A23C03A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFCoreUI", "WPFCoreUI\WPFCoreUI\WPFCoreUI.csproj", "{8BC6DB22-3FF9-4E95-AA79-9F5970182787}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinkoffSearchLibTests", "TinkoffSearchLibTests\TinkoffSearchLibTests\TinkoffSearchLibTests.csproj", "{F0DEBF3E-A6C5-4ECD-B71B-C9911FBD2607}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinkoffSearchLibTests", "TinkoffSearchLibTests\TinkoffSearchLibTests\TinkoffSearchLibTests.csproj", "{F0DEBF3E-A6C5-4ECD-B71B-C9911FBD2607}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E625E07F-B438-475F-B088-C45F4F6C890E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E625E07F-B438-475F-B088-C45F4F6C890E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E625E07F-B438-475F-B088-C45F4F6C890E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E625E07F-B438-475F-B088-C45F4F6C890E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{324B832A-6474-415A-B754-35363E66B3E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{324B832A-6474-415A-B754-35363E66B3E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{324B832A-6474-415A-B754-35363E66B3E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
