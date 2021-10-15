@@ -9,6 +9,8 @@ namespace TinkoffSearchLib.Services
     {
         public static List<Security> GetGrowth(List<Security> securities)
         {
+            if (securities == null) return securities;
+
             securities = securities.ToList();
             foreach (var security in securities)
             {
@@ -19,6 +21,8 @@ namespace TinkoffSearchLib.Services
 
         public static List<Security> GetLinearity(List<Security> securities)
         {
+            if (securities == null) return securities;
+
             securities = securities.ToList();
             foreach (var security in securities)
             {
