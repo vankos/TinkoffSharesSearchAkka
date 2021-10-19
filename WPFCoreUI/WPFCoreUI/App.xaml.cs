@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 namespace WPFCoreUI
 {
@@ -13,5 +7,10 @@ namespace WPFCoreUI
     /// </summary>
     public partial class App : Application
     {
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show($"Возникла неоработанная ошибка:\n{e.Exception.Message}", "Необработанная ошибка", MessageBoxButton.OK);
+            e.Handled = true;
+        }
     }
 }
