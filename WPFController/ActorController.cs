@@ -25,8 +25,8 @@ namespace WPFController
         }
         public List<Security> UnflteredData { get; set; } = new();
         private IActorRef getDataService;
-        private IActorRef analytycalService;
-        private IActorRef saveService;
+        private readonly IActorRef analytycalService;
+        private readonly IActorRef saveService;
         
 
         public ActorController()

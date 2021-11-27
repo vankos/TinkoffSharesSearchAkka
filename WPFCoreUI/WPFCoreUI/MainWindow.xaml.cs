@@ -28,8 +28,8 @@ namespace Tinkoff
     public partial class MainWindow : Window
     {
         public static RoutedCommand ShowCommand { get; set; } = new RoutedCommand();
-        private ActorSystem actorSystem;
-        private IActorRef uiActor;
+        private readonly ActorSystem actorSystem;
+        private readonly IActorRef uiActor;
         public UserData UserData { get; set; }
 
         public MainWindow()
@@ -62,8 +62,7 @@ namespace Tinkoff
 
         private async void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            MessageBoxResult messageBoxResult= MessageBoxResult.Yes;
-            messageBoxResult = MessageBox.Show("Зарузить данные?", "Зарузить данные?", MessageBoxButton.YesNo);
+            MessageBoxResult messageBoxResult = MessageBox.Show("Зарузить данные?", "Зарузить данные?", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
                 ErrorTextBlock.Text = "Загрузка данных";
