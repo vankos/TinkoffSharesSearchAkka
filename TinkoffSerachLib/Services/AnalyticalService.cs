@@ -1,13 +1,20 @@
-﻿using System;
+﻿using Akka.Actor;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TinkoffSearchLib.Models;
 
 namespace TinkoffSearchLib.Services
 {
-    public static class AnalyticalService
+    public class AnalyticalService : ReceiveActor
     {
-        public static List<Security> GetGrowth(List<Security> securities)
+        public AnalyticalService()
+        {
+            Receive<GrowthMessage>(msg => Context.Parent.Tell(new GrowthMessage(GetGrowth(msg.Securities))));
+            Receive<LinearityMessage>(msg => Context.Parent.Tell(new LinearityMessage(GetLinearity(msg.Securities))));
+        }
+
+        private static List<Security> GetGrowth(List<Security> securities)
         {
             if (securities == null) return securities;
 
@@ -19,7 +26,7 @@ namespace TinkoffSearchLib.Services
             return securities;
         }
 
-        public static List<Security> GetLinearity(List<Security> securities)
+        private static List<Security> GetLinearity(List<Security> securities)
         {
             if (securities == null) return securities;
 
@@ -41,4 +48,24 @@ namespace TinkoffSearchLib.Services
             return securities;
         }
     }
+
+    #region Messages
+    public class GrowthMessage
+    {
+        public GrowthMessage(List<Security> securities)
+        {
+            this.Securities = securities;
+        }
+        public List<Security> Securities { get; set; }
+    }
+
+    public class LinearityMessage
+    {
+        public LinearityMessage(List<Security> securities)
+        {
+            this.Securities = securities;
+        }
+        public List<Security> Securities { get; set; }
+    }
+    #endregion
 }

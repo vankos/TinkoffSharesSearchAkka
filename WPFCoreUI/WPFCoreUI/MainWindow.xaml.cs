@@ -15,6 +15,10 @@ using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Notifications.Wpf.Core;
 using TinkoffSearchLib.Models;
+using Akka.Actor;
+using WPFCoreUI;
+using static WPFCoreUI.UIActor;
+using TinkoffSearchLib.Messages;
 
 namespace Tinkoff
 {
@@ -24,56 +28,46 @@ namespace Tinkoff
     public partial class MainWindow : Window
     {
         public static RoutedCommand ShowCommand { get; set; } = new RoutedCommand();
-        private readonly WPFController.WpfController controller;
+        private ActorSystem actorSystem;
+        private IActorRef uiActor;
+        public UserData UserData { get; set; }
+
         public MainWindow()
         {
-            controller = new WPFController.WpfController();
-            controller.OnMessageRecived += (_, e) =>ErrorTextBlock.Text = e;
-            controller.OnNotificationMessageRecived += (_, e) =>
-            {
-                ErrorTextBlock.Text = e;
-                var notificationManager = new NotificationManager();
-                notificationManager.ShowAsync(new NotificationContent
-                {
-                    Title = "Tinkoff shares",
-                    Message = e,
-                    Type = NotificationType.Success
-                });
-            };
-            controller.OnViewDataChanged += (_, data) => DataDataGrid.ItemsSource = data;
-
             InitializeComponent();
-
+            actorSystem = ActorSystem.Create("actorSystem");
+            uiActor = actorSystem.ActorOf(Props.Create(() => new UIActor(this)));
+            DataContext = UserData;
             ShowCommand.InputGestures.Add(new KeyGesture(Key.Enter, ModifierKeys.None));
-
-            DataContext = controller.UserData;
-            USDRadioButton.IsChecked = controller.UserData.Currency == Currency.Usd;
-            RubRadioButton.IsChecked = controller.UserData.Currency == Currency.Rub;
 
             StartDate.SelectedDate = DateTime.Now.AddYears(-1);
             EndDate.SelectedDate = DateTime.Now;
+            actorSystem = ActorSystem.Create("actorSystem");
+           
         }
+
+        private void UpdateUserData() => uiActor.Tell(UserData);
 
         private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            controller.UserData.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
+            if (UserData == null) return;
+            UserData.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
+            UpdateUserData();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            controller.SaveUserData();
+            uiActor.Ask(SimpleMessages.SaveUserData).Wait();
         }
 
         private async void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MessageBoxResult messageBoxResult= MessageBoxResult.Yes;
-            if (controller.UnflteredData.Count != 0)
-                messageBoxResult = MessageBox.Show("Зарузить данные заново?", "Зарузить данные?", MessageBoxButton.YesNo);
-            if (controller.UnflteredData.Count == 0 || messageBoxResult == MessageBoxResult.Yes)
+            messageBoxResult = MessageBox.Show("Зарузить данные?", "Зарузить данные?", MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
             {
                 ErrorTextBlock.Text = "Загрузка данных";
-                await controller.GetData();
-                controller.FilterData();
+                uiActor.Tell(SimpleMessages.GetData);
             }
         }
     }
