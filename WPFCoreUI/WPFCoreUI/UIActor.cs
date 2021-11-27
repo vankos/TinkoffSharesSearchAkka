@@ -61,8 +61,7 @@ namespace WPFCoreUI
                 switch (message)
                 {
                     case SimpleMessages.SaveUserData:
-                        controller.Ask(message).Wait();
-                        Sender.Tell(new object());
+                        Sender.Tell(controller.Ask(message).Result);
                         break;
                     case SimpleMessages.GetData:
                         controller.Tell(message);

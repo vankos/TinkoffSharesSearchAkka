@@ -8,34 +8,44 @@ using System.Linq;
 
 namespace WPFController
 {
-    public class ActorController:ReceiveActor
+    public class ActorController : ReceiveActor
     {
-        public UserData UserData { get; set; }
+        private const string SAVEFILEPATH = "savedData.dat";
+
+        private UserData userData;
+        public UserData UserData 
+        { 
+            get => userData;
+            set 
+            { 
+                userData = value;
+                userData.OnLinearityChanged += (_, _) => analytycalService.Tell(new LinearityMessage(UnflteredData));
+                userData.OnMoneyLimitValueChanged += (_, _) => analytycalService.Tell(new GrowthMessage(UnflteredData));
+            } 
+        }
         public List<Security> UnflteredData { get; set; } = new();
         private IActorRef getDataService;
         private IActorRef analytycalService;
+        private IActorRef saveService;
+        
 
         public ActorController()
         {
-            UserData =  SaveService.LoadData();
-            UserData.OnLinearityChanged += (_, _) => analytycalService.Tell(new LinearityMessage(UnflteredData));
-            UserData.OnMoneyLimitValueChanged += (_, _) => analytycalService.Tell(new GrowthMessage(UnflteredData));
-
-            getDataService = Context.ActorOf(Props.Create(() => new GetDataService(UserData.Token)));
             analytycalService = Context.ActorOf(Props.Create(() => new AnalyticalService()));
+            saveService = Context.ActorOf(Props.Create(() => new SaveService()));
 
             Receive<string>(message =>
             {
-                switch(message)
+                switch (message)
                 {
                     case SimpleMessages.SaveUserData:
-                        SaveUserData();
-                        Sender.Tell(new object());
+                        Sender.Tell(saveService.Ask(new SaveUserDataMessage(UserData, SAVEFILEPATH)));
                         break;
                     case SimpleMessages.GetData:
                         GetData();
                         break;
                     case SimpleMessages.ContextRequest:
+                        UserData = saveService.Ask(new LoadUserDataMessage(SAVEFILEPATH)).Result as UserData;
                         Sender.Tell(UserData);
                         break;
                 }
@@ -43,25 +53,23 @@ namespace WPFController
 
             Receive<TextMessage>(msg => Context.Parent.Tell(msg));
 
-            Receive<UnfilteredDataMessage>(msg => 
+            Receive<UnfilteredDataMessage>(msg =>
             {
                 UnflteredData = msg.Securities;
                 analytycalService.Tell(new GrowthMessage(UnflteredData));
             });
 
             Receive<GrowthMessage>(msg => analytycalService.Tell(new LinearityMessage(msg.Securities)));
-            Receive<LinearityMessage>(msg => Context.Parent.Tell(msg.Securities.Where(s=>s.Linearity<=UserData.Linearity&& s.Candles.Last().Close<=UserData.MoneyLimit).ToList()));
-        }
 
-        private void SaveUserData()
-        {
-            SaveService.SaveData(UserData);
+            Receive<LinearityMessage>(msg => Context.Parent.Tell(msg.Securities.Where(s => s.Linearity <= UserData.Linearity && s.Candles.Last().Close <= UserData.MoneyLimit).ToList()));
         }
 
         private void GetData()
         {
             if (UserData.Token == null && getDataService is null)
                 Context.Parent.Tell(new TextMessage("Нет токена", false));
+            if(getDataService==null)
+                getDataService = Context.ActorOf(Props.Create(() => new GetDataService(UserData.Token)));
             try
             {
                 getDataService.Tell(new GetDataMessage(UserData.StartDate, UserData.EndDate, UserData.Currency));
