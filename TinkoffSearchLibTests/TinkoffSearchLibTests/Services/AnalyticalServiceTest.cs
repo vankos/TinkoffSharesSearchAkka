@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using TinkoffSearchLib.Models;
 using TinkoffSearchLib.Services;
 using Tinkoff.Trading.OpenApi.Models;
+using Akka.Actor;
 
 namespace TinkoffSearchLibTests
 {
     [TestClass]
     public class AnalyticalServiceTest
     {
+        ActorSystem actorSystem = ActorSystem.Create("actorSystem");
+        private IActorRef _service;
+
+        public AnalyticalServiceTest()
+        {
+            _service = actorSystem.ActorOf(Props.Create(() => new AnalyticalService()));
+        }
+
         [TestMethod]
         public void GetGrowthTest()
         {
@@ -25,7 +34,7 @@ namespace TinkoffSearchLibTests
                 }
             };
 
-            AnalyticalService.GetGrowth(securityList);
+            _service.Tell() .GetGrowth(securityList);
 
             Assert.AreEqual(100, securityList[0].Growth);
         }
