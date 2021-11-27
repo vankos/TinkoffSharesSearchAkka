@@ -13,21 +13,20 @@ namespace WPFController
         private const string SAVEFILEPATH = "savedData.dat";
 
         private UserData userData;
-        public UserData UserData 
-        { 
+        public UserData UserData
+        {
             get => userData;
-            set 
-            { 
+            set
+            {
                 userData = value;
                 userData.OnLinearityChanged += (_, _) => analytycalService.Tell(new LinearityMessage(UnflteredData));
                 userData.OnMoneyLimitValueChanged += (_, _) => analytycalService.Tell(new GrowthMessage(UnflteredData));
-            } 
+            }
         }
         public List<Security> UnflteredData { get; set; } = new();
         private IActorRef getDataService;
         private readonly IActorRef analytycalService;
         private readonly IActorRef saveService;
-        
 
         public ActorController()
         {

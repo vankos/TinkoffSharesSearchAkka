@@ -11,7 +11,7 @@ namespace TinkoffSearchLib.Services
     {
         public SaveService()
         {
-            Receive<SaveUserDataMessage>(msg => 
+            Receive<SaveUserDataMessage>(msg =>
             {
                 SaveData(msg.UserData, msg.FilePath);
                 Sender.Tell(SimpleMessages.Saved);

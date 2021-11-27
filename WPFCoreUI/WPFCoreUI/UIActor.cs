@@ -21,7 +21,7 @@ namespace WPFCoreUI
         public UIActor(MainWindow mainWindow)
         {
             controller = Context.ActorOf(Props.Create(() =>new ActorController()));
-            
+
             mainWindow.Dispatcher.Invoke(() =>
             {
                 mainWindow.DataContext = mainWindow.UserData =  controller.Ask(SimpleMessages.ContextRequest).Result as UserData;
@@ -46,14 +46,13 @@ namespace WPFCoreUI
 
             Receive<List<Security>>(secs => mainWindow.Dispatcher.Invoke(() =>
             mainWindow.DataDataGrid.ItemsSource = secs));
-            
+
             Receive<UserData>(msg=>
             {
                 if(Sender.Path == Context.Parent.Path)
                     controller.Tell(msg);
                 else
                     mainWindow.Dispatcher.Invoke(() => mainWindow.DataContext = mainWindow.UserData = msg);
-
             });
 
             Receive<string>(message =>
@@ -68,7 +67,6 @@ namespace WPFCoreUI
                         break;
                 }
             });
-
         }
     }
 }

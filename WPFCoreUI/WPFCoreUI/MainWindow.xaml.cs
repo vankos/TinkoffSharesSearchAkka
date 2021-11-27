@@ -43,7 +43,6 @@ namespace Tinkoff
             StartDate.SelectedDate = DateTime.Now.AddYears(-1);
             EndDate.SelectedDate = DateTime.Now;
             actorSystem = ActorSystem.Create("actorSystem");
-           
         }
 
         private void UpdateUserData() => uiActor.Tell(UserData);
@@ -60,7 +59,7 @@ namespace Tinkoff
             uiActor.Ask(SimpleMessages.SaveUserData).Wait();
         }
 
-        private async void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        private void ShowCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MessageBoxResult messageBoxResult = MessageBox.Show("Зарузить данные?", "Зарузить данные?", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)

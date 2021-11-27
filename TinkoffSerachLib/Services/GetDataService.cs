@@ -72,7 +72,7 @@ namespace TinkoffSearchLib.Services
             catch (Exception e)
             {
                 Context.Parent.Tell(new TextMessage(e.Message, false));
-                return null;
+                return new List<Security>();
             }
         }
     }
