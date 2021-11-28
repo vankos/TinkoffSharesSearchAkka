@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Tinkoff.Trading.OpenApi.Models;
 using Tinkoff.Trading.OpenApi.Network;
 using TinkoffSearchLib.Messages;
@@ -25,15 +26,15 @@ namespace TinkoffSearchLib.Services
                 Context.Parent.Tell(new TextMessage("Не удалось получить контекст", false));
             }
 
-            Receive<GetDataMessage>(msg => Sender.Tell(new UnfilteredDataMessage(GetCandlesForAllSharesOnDate(msg.StartDate, msg.EndDate, msg.Currency))));
+            Receive<GetDataMessage>(msg => GetCandlesForAllSharesOnDate(msg.StartDate, msg.EndDate, msg.Currency,Context.Parent).PipeTo(Context.Parent));
         }
 
-        private List<Security> GetCandlesForAllSharesOnDate(DateTime startDate, DateTime endDate, Currency currency)
+        private async Task<UnfilteredDataMessage> GetCandlesForAllSharesOnDate(DateTime startDate, DateTime endDate, Currency currency, IActorRef parent)
         {
             if (startDate > endDate)
             {
                 Context.Parent.Tell(new TextMessage("Первая дата больше второй", false));
-                return new List<Security>();
+                return new UnfilteredDataMessage(new  List<Security>());
             }
 
             CandleInterval interval = CandleInterval.Week;
@@ -41,7 +42,7 @@ namespace TinkoffSearchLib.Services
             else if ((endDate - startDate).TotalDays <= 90) interval = CandleInterval.Day;
             try
             {
-                MarketInstrumentList markertlist = context.MarketStocksAsync().Result;
+                 MarketInstrumentList markertlist = await context.MarketStocksAsync().ConfigureAwait(false);
 
                 int failedInstrumentsCounter = 0;
                 List<Security> securities = new();
@@ -50,7 +51,7 @@ namespace TinkoffSearchLib.Services
                     try
                     {
                         Thread.Sleep(250);
-                        List<CandlePayload> candles = (context.MarketCandlesAsync(instrument.Figi, DateTime.SpecifyKind(startDate, DateTimeKind.Local), DateTime.SpecifyKind(endDate, DateTimeKind.Local), interval)).Result.Candles;
+                        List<CandlePayload> candles = (await context.MarketCandlesAsync(instrument.Figi, DateTime.SpecifyKind(startDate, DateTimeKind.Local), DateTime.SpecifyKind(endDate, DateTimeKind.Local), interval).ConfigureAwait(false)).Candles;
                         if (candles.Count > 0)
                         {
                             securities.Add(new Security()
@@ -66,13 +67,13 @@ namespace TinkoffSearchLib.Services
                     }
                 }
                 string message = $"Всего {securities.Count + failedInstrumentsCounter} акций \nУспешно {securities.Count} акций\nЗафейлилось {failedInstrumentsCounter} акций";
-                Context.Parent.Tell(new TextMessage(message, true));
-                return securities;
+                parent.Tell(new TextMessage(message, true));
+                return new UnfilteredDataMessage(securities);
             }
             catch (Exception e)
             {
-                Context.Parent.Tell(new TextMessage(e.Message, false));
-                return new List<Security>();
+               parent.Tell(new TextMessage(e.Message, false));
+                return new UnfilteredDataMessage(new List<Security>());
             }
         }
     }
