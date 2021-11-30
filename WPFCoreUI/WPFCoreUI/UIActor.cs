@@ -22,12 +22,7 @@ namespace WPFCoreUI
         {
             controller = Context.ActorOf(Props.Create(() =>new ActorController()));
 
-            mainWindow.Dispatcher.Invoke(() =>
-            {
-                mainWindow.DataContext = mainWindow.UserData =  controller.Ask(SimpleMessages.ContextRequest).Result as UserData;
-                mainWindow.USDRadioButton.IsChecked = mainWindow.UserData.Currency == Currency.Usd;
-                mainWindow.RubRadioButton.IsChecked = mainWindow.UserData.Currency == Currency.Rub;
-            });
+            mainWindow.Dispatcher.Invoke(() =>  mainWindow.DataContext = mainWindow.UserData =  controller.Ask(SimpleMessages.ContextRequest).Result as UserData);
 
             Receive<TextMessage>(message => mainWindow.Dispatcher.Invoke(()=>
             {

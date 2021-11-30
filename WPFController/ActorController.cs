@@ -71,7 +71,7 @@ namespace WPFController
                 getDataService = Context.ActorOf(Props.Create(() => new GetDataService(UserData.Token)));
             try
             {
-                getDataService.Tell(new GetDataMessage(UserData.StartDate, UserData.EndDate, UserData.Currency));
+                getDataService.Tell(new GetDataMessage(UserData));
             }
             catch (Exception ex)
             {

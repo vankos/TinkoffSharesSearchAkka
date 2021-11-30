@@ -45,15 +45,6 @@ namespace Tinkoff
             actorSystem = ActorSystem.Create("actorSystem");
         }
 
-        private void UpdateUserData() => uiActor.Tell(UserData);
-
-        private void RubRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if (UserData == null) return;
-            UserData.Currency = RubRadioButton?.IsChecked == true ? Currency.Rub : Currency.Usd;
-            UpdateUserData();
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             uiActor.Ask(SimpleMessages.SaveUserData).Wait();

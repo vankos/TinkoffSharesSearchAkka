@@ -26,32 +26,41 @@ namespace TinkoffSearchLib.Services
                 Context.Parent.Tell(new TextMessage("Не удалось получить контекст", false));
             }
 
-            Receive<GetDataMessage>(msg => GetCandlesForAllSharesOnDate(msg.StartDate, msg.EndDate, msg.Currency,Context.Parent).PipeTo(Context.Parent));
+            Receive<GetDataMessage>(msg => GetCandlesForAllSharesOnDate(msg.UserData, Sender).PipeTo(Context.Parent));
         }
 
-        private async Task<UnfilteredDataMessage> GetCandlesForAllSharesOnDate(DateTime startDate, DateTime endDate, Currency currency, IActorRef parent)
+        private async Task<UnfilteredDataMessage> GetCandlesForAllSharesOnDate(UserData userData, IActorRef sender)
         {
-            if (startDate > endDate)
+            if (userData.StartDate > userData.EndDate)
             {
                 Context.Parent.Tell(new TextMessage("Первая дата больше второй", false));
-                return new UnfilteredDataMessage(new  List<Security>());
+                return new UnfilteredDataMessage(new List<Security>());
             }
 
             CandleInterval interval = CandleInterval.Week;
-            if ((endDate - startDate).TotalDays <= 7) interval = CandleInterval.Hour;
-            else if ((endDate - startDate).TotalDays <= 90) interval = CandleInterval.Day;
+            if ((userData.EndDate - userData.StartDate).TotalDays <= 7) interval = CandleInterval.Hour;
+            else if ((userData.EndDate - userData.StartDate).TotalDays <= 90) interval = CandleInterval.Day;
             try
             {
-                 MarketInstrumentList markertlist = await context.MarketStocksAsync().ConfigureAwait(false);
+                List<MarketInstrument> marketInstruments = new();
+                if (userData.IsShares)
+                    marketInstruments.AddRange((await context.MarketStocksAsync().ConfigureAwait(false)).Instruments);
+                if (userData.IsETF)
+                    marketInstruments.AddRange((await context.MarketEtfsAsync().ConfigureAwait(false)).Instruments);
+
+                if (!userData.IsUSD)
+                    marketInstruments = marketInstruments.Where(instr => instr.Currency == Currency.Rub).ToList();
+                if (!userData.IsRUR)
+                    marketInstruments = marketInstruments.Where(instr => instr.Currency == Currency.Eur).ToList();
 
                 int failedInstrumentsCounter = 0;
                 List<Security> securities = new();
-                foreach (var instrument in markertlist.Instruments.Where((i) => i.Currency == currency))
+                foreach (var instrument in marketInstruments)
                 {
                     try
                     {
                         Thread.Sleep(250);
-                        List<CandlePayload> candles = (await context.MarketCandlesAsync(instrument.Figi, DateTime.SpecifyKind(startDate, DateTimeKind.Local), DateTime.SpecifyKind(endDate, DateTimeKind.Local), interval).ConfigureAwait(false)).Candles;
+                        List<CandlePayload> candles = (await context.MarketCandlesAsync(instrument.Figi, DateTime.SpecifyKind(userData.StartDate, DateTimeKind.Local), DateTime.SpecifyKind(userData.EndDate, DateTimeKind.Local), interval).ConfigureAwait(false)).Candles;
                         if (candles.Count > 0)
                         {
                             securities.Add(new Security()
@@ -67,12 +76,12 @@ namespace TinkoffSearchLib.Services
                     }
                 }
                 string message = $"Всего {securities.Count + failedInstrumentsCounter} акций \nУспешно {securities.Count} акций\nЗафейлилось {failedInstrumentsCounter} акций";
-                parent.Tell(new TextMessage(message, true));
+                sender.Tell(new TextMessage(message, true));
                 return new UnfilteredDataMessage(securities);
             }
             catch (Exception e)
             {
-               parent.Tell(new TextMessage(e.Message, false));
+                sender.Tell(new TextMessage(e.Message, false));
                 return new UnfilteredDataMessage(new List<Security>());
             }
         }
@@ -81,16 +90,12 @@ namespace TinkoffSearchLib.Services
     #region Messages
     public class GetDataMessage
     {
-        public GetDataMessage(DateTime startDate, DateTime endDate, Currency currency)
+        public GetDataMessage(UserData userData)
         {
-            StartDate = startDate;
-            EndDate = endDate;
-            Currency = currency;
+            UserData = userData;
         }
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public Currency Currency { get; set; }
+        public UserData UserData { get; set; }
     }
 
     public class UnfilteredDataMessage
