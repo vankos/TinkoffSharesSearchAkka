@@ -51,7 +51,7 @@ namespace TinkoffSearchLib.Services
                 if (!userData.IsUSD)
                     marketInstruments = marketInstruments.Where(instr => instr.Currency == Currency.Rub).ToList();
                 if (!userData.IsRUR)
-                    marketInstruments = marketInstruments.Where(instr => instr.Currency == Currency.Eur).ToList();
+                    marketInstruments = marketInstruments.Where(instr => instr.Currency == Currency.Usd).ToList();
 
                 int failedInstrumentsCounter = 0;
                 List<Security> securities = new();
