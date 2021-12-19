@@ -1,16 +1,34 @@
 ﻿using System;
-using Tinkoff.Trading.OpenApi.Models;
+using System.ComponentModel;
 
 namespace TinkoffSearchLib.Models
 {
     [Serializable]
-    public class UserData
+    public class UserData : INotifyPropertyChanged
     {
         private decimal moneyLimitValue;
         private decimal linearity;
+        private DateTime startDate;
+        private DateTime endDate;
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime StartDate
+        {
+            get => startDate;
+            set
+            {
+                startDate = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StartDate)));
+            }
+        }
+        public DateTime EndDate
+        {
+            get => endDate;
+            set
+            {
+                endDate = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EndDate)));
+            }
+        }
         public string Token { get; set; }
         public decimal MoneyLimit
         {
@@ -39,5 +57,6 @@ namespace TinkoffSearchLib.Models
 
         public event EventHandler<decimal> OnMoneyLimitValueChanged;
         public event EventHandler<decimal> OnLinearityChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

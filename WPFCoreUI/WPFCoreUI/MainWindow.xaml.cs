@@ -59,5 +59,17 @@ namespace Tinkoff
                 uiActor.Tell(SimpleMessages.GetData);
             }
         }
+
+        private void ForMonthButton_Click(object sender, RoutedEventArgs e)
+        {
+            UserData.EndDate = DateTime.Now;
+            UserData.StartDate = UserData.EndDate.AddMonths(-1);
+        }
+
+        private void ForYearButton_Click(object sender, RoutedEventArgs e)
+        {
+            UserData.EndDate = DateTime.Now;
+            UserData.StartDate = UserData.EndDate.AddYears(-1);
+        }
     }
 }
