@@ -19,8 +19,7 @@ namespace WPFController
             set
             {
                 userData = value;
-                userData.OnLinearityChanged += (_, _) => analytycalService.Tell(new LinearityMessage(UnflteredData));
-                userData.OnMoneyLimitValueChanged += (_, _) => analytycalService.Tell(new GrowthMessage(UnflteredData));
+                userData.OnFiltersChanged += (_, _) => analytycalService.Tell(new DataMessage(UnflteredData));
             }
         }
         public List<Security> UnflteredData { get; set; } = new();
@@ -55,12 +54,14 @@ namespace WPFController
             Receive<UnfilteredDataMessage>(msg =>
             {
                 UnflteredData = msg.Securities;
-                analytycalService.Tell(new GrowthMessage(UnflteredData));
+                analytycalService.Tell(new DataMessage(UnflteredData));
             });
 
-            Receive<GrowthMessage>(msg => analytycalService.Tell(new LinearityMessage(msg.Securities)));
-
-            Receive<LinearityMessage>(msg => Context.Parent.Tell(msg.Securities.Where(s => s.Linearity <= UserData.Linearity && s.Candles.Last().Close <= UserData.MoneyLimit).ToList()));
+            Receive<DataMessage>(msg => Context.Parent.Tell(msg.Securities.Where(s =>
+            s.Linearity <= UserData.Linearity &&
+            s.Candles.Last().Close <= UserData.MoneyLimit &&
+            (UserData.ShowNew || s.Candles[0].Time < UserData.StartDate.AddDays(7))
+            ).ToList()));
         }
 
         private void GetData()

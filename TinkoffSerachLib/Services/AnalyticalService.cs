@@ -10,8 +10,7 @@ namespace TinkoffSearchLib.Services
     {
         public AnalyticalService()
         {
-            Receive<GrowthMessage>(msg => Context.Parent.Tell(new GrowthMessage(GetGrowth(msg.Securities))));
-            Receive<LinearityMessage>(msg => Context.Parent.Tell(new LinearityMessage(GetLinearity(msg.Securities))));
+            Receive<DataMessage>(msg => Context.Parent.Tell(new DataMessage(GetGrowth(GetLinearity(msg.Securities)))));
         }
 
         private static List<Security> GetGrowth(List<Security> securities)
@@ -50,20 +49,12 @@ namespace TinkoffSearchLib.Services
     }
 
     #region Messages
-    public class GrowthMessage
-    {
-        public GrowthMessage(List<Security> securities)
-        {
-            this.Securities = securities;
-        }
-        public List<Security> Securities { get; set; }
-    }
 
-    public class LinearityMessage
+    public class DataMessage
     {
-        public LinearityMessage(List<Security> securities)
+        public DataMessage(List<Security> securities)
         {
-            this.Securities = securities;
+            Securities = securities;
         }
         public List<Security> Securities { get; set; }
     }

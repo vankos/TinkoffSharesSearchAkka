@@ -8,6 +8,7 @@ namespace TinkoffSearchLib.Models
     {
         private decimal moneyLimitValue;
         private decimal linearity;
+        private bool showNew;
         private DateTime startDate;
         private DateTime endDate;
 
@@ -36,7 +37,7 @@ namespace TinkoffSearchLib.Models
             set
             {
                 moneyLimitValue = value;
-                OnMoneyLimitValueChanged?.Invoke(this, value);
+                OnFiltersChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -46,7 +47,17 @@ namespace TinkoffSearchLib.Models
             set
             {
                 linearity = value;
-                OnLinearityChanged?.Invoke(this, value);
+                OnFiltersChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public bool ShowNew
+        {
+            get { return showNew; }
+            set
+            {
+                showNew = value;
+                OnFiltersChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -55,8 +66,7 @@ namespace TinkoffSearchLib.Models
         public bool IsShares { get; set; }
         public bool IsETF { get; set; }
 
-        public event EventHandler<decimal> OnMoneyLimitValueChanged;
-        public event EventHandler<decimal> OnLinearityChanged;
+        public event EventHandler OnFiltersChanged;
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }
