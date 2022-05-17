@@ -40,7 +40,7 @@ namespace WPFCoreUI
             }));
 
             Receive<List<Security>>(secs => mainWindow.Dispatcher.Invoke(() =>
-            mainWindow.DataDataGrid.ItemsSource = secs));
+            mainWindow.UserData.Securities = secs));
 
             Receive<UserData>(msg=>
             {

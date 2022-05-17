@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace TinkoffSearchLib.Models
 {
@@ -11,6 +13,7 @@ namespace TinkoffSearchLib.Models
         private bool showNew;
         private DateTime startDate;
         private DateTime endDate;
+        private List<Security> securities;
 
         public DateTime StartDate
         {
@@ -58,6 +61,17 @@ namespace TinkoffSearchLib.Models
             {
                 showNew = value;
                 OnFiltersChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        [JsonIgnore]
+        public List<Security> Securities
+        {
+            get => securities;
+            set
+            {
+                securities = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Securities)));
             }
         }
 
